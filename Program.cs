@@ -8,17 +8,17 @@ var app = builder.Build();
 app.MapGet("/", () => "Kirjasovellus!");
 
 app.MapGet("/books", async (BookDb db) =>
-    await db.Todos.ToListAsync());
+    await db.Books.ToListAsync());
 
 app.MapGet("/books/{id}", async (int id, BookDb db) =>
-    await db.Todos.FindAsync(id)
+    await db.Books.FindAsync(id)
         is Book book
             ? Results.Ok(book)
             : Results.NotFound());
 
 app.MapPost("/books", async (Book book, BookDb db) =>
 {
-    db.Todos.Add(book);
+    db.Books.Add(book);
     await db.SaveChangesAsync();
 
     return Results.Created($"/books/{book.Id}", book);
@@ -26,7 +26,7 @@ app.MapPost("/books", async (Book book, BookDb db) =>
 
 app.MapPut("/books/{id}", async (int id, Book inputBook, BookDb db) =>
 {
-    var book = await db.Todos.FindAsync(id);
+    var book = await db.Books.FindAsync(id);
 
     if (book is null) return Results.NotFound();
 
@@ -39,9 +39,9 @@ app.MapPut("/books/{id}", async (int id, Book inputBook, BookDb db) =>
 
 app.MapDelete("/books/{id}", async (int id, BookDb db) =>
 {
-    if (await db.Todos.FindAsync(id) is Book book)
+    if (await db.Books.FindAsync(id) is Book book)
     {
-        db.Todos.Remove(book);
+        db.Books.Remove(book);
         await db.SaveChangesAsync();
         return Results.NoContent();
     }
@@ -63,5 +63,5 @@ class BookDb : DbContext
     public BookDb(DbContextOptions<BookDb> options)
         : base(options) { }
 
-    public DbSet<Book> Todos => Set<Book>();
+    public DbSet<Book> Books => Set<Book>();
 }
